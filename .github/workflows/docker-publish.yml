@@ -34,7 +34,6 @@ jobs:
         with:
           repository: clawdbot/clawdbot
           fetch-depth: 0
-          token: ${{ secrets.GH_PAT }}
           path: clawdbot-source
 
       - name: Copy Dockerfile to source repository
