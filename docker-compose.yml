@@ -38,16 +38,29 @@ services:
       # Optional: Canvas host port (only if running iOS/Android nodes)
       # - "18793:18793"
     command:
-      [
-        "node",
-        "dist/index.js",
-        "gateway",
-        "--allow-unconfigured",
-        "--bind",
-        "${CLAWDBOT_GATEWAY_BIND:-lan}",
-        "--port",
-        "${CLAWDBOT_GATEWAY_PORT:-18789}"
-      ]
+      - /bin/sh
+      - -c
+      - |
+        # Sync CLAWDBOT_GATEWAY_TOKEN from environment to config file if set
+        if [ -n "$$CLAWDBOT_GATEWAY_TOKEN" ] && [ -f "/home/node/.clawdbot/clawdbot.json" ]; then
+          node -e "
+            const fs = require('fs');
+            const configPath = '/home/node/.clawdbot/clawdbot.json';
+            if (fs.existsSync(configPath)) {
+              const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+              if (config.gateway && config.gateway.auth && process.env.CLAWDBOT_GATEWAY_TOKEN) {
+                const envToken = process.env.CLAWDBOT_GATEWAY_TOKEN;
+                if (config.gateway.auth.token !== envToken) {
+                  config.gateway.auth.token = envToken;
+                  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+                  console.log('[startup] Synced config token to match environment variable');
+                }
+              }
+            }
+          "
+        fi
+        # Start the gateway
+        exec node dist/index.js gateway --allow-unconfigured --bind $${CLAWDBOT_GATEWAY_BIND:-lan} --port $${CLAWDBOT_GATEWAY_PORT:-18789}
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:18789/__clawdbot__/canvas/ || exit 1"]
       interval: 30s
