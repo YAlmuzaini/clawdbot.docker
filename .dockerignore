@@ -1,0 +1,50 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+README.md
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Node modules (will be installed in container)
+node_modules/
+ui/node_modules/
+
+# Build artifacts
+dist/
+build/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data directories (should be mounted, not copied)
+data/
+.clawdbot/
+clawd/
+
+# Test files
+test/
+tests/
+*.test.js
+*.spec.js
+
+# Temporary files
+tmp/
+temp/
+*.tmp

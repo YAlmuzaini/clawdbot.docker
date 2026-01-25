@@ -1,0 +1,90 @@
+services:
+  clawdbot-gateway:
+    # Use pre-built image from Docker Hub (recommended)
+    # Set CLAWDBOT_IMAGE to your Docker Hub image, e.g., "almuzaini/clawdbot:latest"
+    image: ${CLAWDBOT_IMAGE:-almuzaini/clawdbot:latest}
+    # Uncomment below to build from source instead (requires Clawdbot repository)
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      - HOME=/home/node
+      - NODE_ENV=production
+      - TERM=xterm-256color
+      - CLAWDBOT_GATEWAY_BIND=${CLAWDBOT_GATEWAY_BIND:-lan}
+      - CLAWDBOT_GATEWAY_PORT=${CLAWDBOT_GATEWAY_PORT:-18789}
+      - CLAWDBOT_GATEWAY_TOKEN=${CLAWDBOT_GATEWAY_TOKEN:?}
+      - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD:?}
+      - XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-/home/node/.clawdbot}
+      - PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+    volumes:
+      # Persistent config directory (gateway config, tokens, model auth profiles, skill configs)
+      - type: bind
+        source: ${CLAWDBOT_CONFIG_DIR:-./data/.clawdbot}
+        target: /home/node/.clawdbot
+        is_directory: true
+      # Persistent workspace directory (agent workspace, code, artifacts)
+      - type: bind
+        source: ${CLAWDBOT_WORKSPACE_DIR:-./data/clawd}
+        target: /home/node/clawd
+        is_directory: true
+    ports:
+      # Gateway port - Coolify will proxy this via domain or you can access directly
+      # For Coolify domain routing, use SERVICE_URL_CLAWDBOT_GATEWAY magic variable
+      - "${CLAWDBOT_GATEWAY_PORT:-18789}:18789"
+      # Optional: Canvas host port (only if running iOS/Android nodes)
+      # - "18793:18793"
+    command:
+      [
+        "node",
+        "dist/index.js",
+        "gateway",
+        "--bind",
+        "${CLAWDBOT_GATEWAY_BIND:-lan}",
+        "--port",
+        "${CLAWDBOT_GATEWAY_PORT:-18789}"
+      ]
+    healthcheck:
+      test: ["CMD", "node", "dist/index.js", "health", "--token", "${CLAWDBOT_GATEWAY_TOKEN}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    labels:
+      - coolify.managed=true
+      - coolify.type=application
+
+  # Optional: CLI service for running commands (onboarding, channel setup, etc.)
+  clawdbot-cli:
+    # Use same image as gateway
+    image: ${CLAWDBOT_IMAGE:-almuzaini/clawdbot:latest}
+    # Uncomment below to build from source instead (requires Clawdbot repository)
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
+    profiles:
+      - cli
+    env_file:
+      - .env
+    environment:
+      - HOME=/home/node
+      - NODE_ENV=production
+      - TERM=xterm-256color
+      - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD:?}
+      - XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-/home/node/.clawdbot}
+    volumes:
+      - type: bind
+        source: ${CLAWDBOT_CONFIG_DIR:-./data/.clawdbot}
+        target: /home/node/.clawdbot
+        is_directory: true
+      - type: bind
+        source: ${CLAWDBOT_WORKSPACE_DIR:-./data/clawd}
+        target: /home/node/clawd
+        is_directory: true
+    exclude_from_hc: true
+    labels:
+      - coolify.managed=true
+      - coolify.type=application
