@@ -42,6 +42,7 @@ services:
         "node",
         "dist/index.js",
         "gateway",
+        "--allow-unconfigured",
         "--bind",
         "${CLAWDBOT_GATEWAY_BIND:-lan}",
         "--port",
