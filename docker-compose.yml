@@ -8,6 +8,8 @@ services:
     #   context: .
     #   dockerfile: Dockerfile
     restart: unless-stopped
+    # Note: Resource limits should be set in Coolify UI (Application Settings → Resources)
+    # Recommended: At least 2GB memory limit for onboard command
     env_file:
       - .env
     environment:
