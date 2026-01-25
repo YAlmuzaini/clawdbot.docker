@@ -23,12 +23,12 @@ services:
     volumes:
       # Persistent config directory (gateway config, tokens, model auth profiles, skill configs)
       - type: bind
-        source: ${CLAWDBOT_CONFIG_DIR:-./data/.clawdbot}
+        source: ./data/.clawdbot
         target: /home/node/.clawdbot
         is_directory: true
       # Persistent workspace directory (agent workspace, code, artifacts)
       - type: bind
-        source: ${CLAWDBOT_WORKSPACE_DIR:-./data/clawd}
+        source: ./data/clawd
         target: /home/node/clawd
         is_directory: true
     ports:
@@ -77,11 +77,11 @@ services:
       - XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-/home/node/.clawdbot}
     volumes:
       - type: bind
-        source: ${CLAWDBOT_CONFIG_DIR:-./data/.clawdbot}
+        source: ./data/.clawdbot
         target: /home/node/.clawdbot
         is_directory: true
       - type: bind
-        source: ${CLAWDBOT_WORKSPACE_DIR:-./data/clawd}
+        source: ./data/clawd
         target: /home/node/clawd
         is_directory: true
     exclude_from_hc: true
