@@ -13,7 +13,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME || 'yourusername' }}/clawdbot
+  IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME || 'almuzaini' }}/clawdbot
 
 jobs:
   build-and-push:
@@ -23,23 +23,24 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout Clawdbot repository
+      - name: Checkout Dockerfile repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository }}
+          path: docker-config
+
+      - name: Checkout Clawdbot source repository
         uses: actions/checkout@v4
         with:
           repository: clawdbot/clawdbot
           fetch-depth: 0
           token: ${{ secrets.GH_PAT }}
+          path: clawdbot-source
 
-      - name: Copy Dockerfile
+      - name: Copy Dockerfile to source repository
         run: |
-          # Copy Dockerfile from this repository
-          # Adjust path if Dockerfile is in a different location
-          if [ -f Dockerfile ]; then
-            echo "Dockerfile already exists in repository"
-          else
-            echo "Note: You need to copy the Dockerfile from the clawdbot.docker repository"
-            echo "Or ensure the Dockerfile is in the Clawdbot repository root"
-          fi
+          cp docker-config/Dockerfile clawdbot-source/Dockerfile
+          echo "Dockerfile copied successfully"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -67,8 +68,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: .
-          file: ./Dockerfile
+          context: ./clawdbot-source
+          file: ./clawdbot-source/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
