@@ -1,10 +1,10 @@
 #!/bin/bash
 # Safe script to run onboard without being killed by terminal closure
 
-CONTAINER_NAME=${1:-$(docker ps | grep clawdbot-gateway | awk '{print $1}' | head -1)}
+CONTAINER_NAME=${1:-$(docker ps | grep openclaw-gateway | awk '{print $1}' | head -1)}
 
 if [ -z "$CONTAINER_NAME" ]; then
-  echo "Error: Could not find clawdbot container"
+  echo "Error: Could not find openclaw container"
   echo "Usage: $0 [container-name]"
   exit 1
 fi

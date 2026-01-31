@@ -1,4 +1,4 @@
-# Clawdbot Docker Image
+# OpenClaw Docker Image
 
 > ⚠️ **EXPERIMENTAL - NOT READY FOR PRODUCTION USE** ⚠️
 > 
@@ -6,33 +6,33 @@
 
 ## Overview
 
-Pre-built Docker image for deploying [Clawdbot Gateway](https://github.com/clawdbot/clawdbot) using Docker Compose, initially designed for deployment on [Coolify](https://coolify.io).
+Pre-built Docker image for deploying [OpenClaw Gateway](https://github.com/openclaw/openclaw) using Docker Compose, initially designed for deployment on [Coolify](https://coolify.io).
 
 ## Quick Start
 
 ### Using Docker Compose (Recommended for Coolify)
 
 ```bash
-docker pull almuzaini/clawdbot:latest
+docker pull almuzaini/openclaw:latest
 ```
 
-Then use with the provided `docker-compose.yml` file. See the [repository](https://github.com/YAlmuzaini/clawdbot.docker) for full setup instructions.
+Then use with the provided `docker-compose.yml` file. See the [repository](https://github.com/YAlmuzaini/openclaw.docker) for full setup instructions.
 
 ### Direct Docker Run
 
 ```bash
 docker run -d \
   -p 18789:18789 \
-  -e CLAWDBOT_GATEWAY_TOKEN=your-token \
+  -e OPENCLAW_GATEWAY_TOKEN=your-token \
   -e GOG_KEYRING_PASSWORD=your-password \
-  -v $(pwd)/.clawdbot:/home/node/.clawdbot \
+  -v $(pwd)/.openclaw:/home/node/.openclaw \
   -v $(pwd)/clawd:/home/node/clawd \
-  almuzaini/clawdbot:latest
+  almuzaini/openclaw:latest
 ```
 
 ## Features
 
-- Pre-built Clawdbot Gateway image
+- Pre-built OpenClaw Gateway image
 - Includes baked-in binaries (gog, goplaces, wacli)
 - Optimized for [Coolify](https://coolify.io) deployment
 - Automatic token synchronization
@@ -47,9 +47,9 @@ docker run -d \
 ## Documentation
 
 For detailed setup instructions, deployment guides, and troubleshooting, visit:
-- **Repository**: https://github.com/YAlmuzaini/clawdbot.docker
+- **Repository**: https://github.com/YAlmuzaini/openclaw.docker
 - **Coolify**: https://coolify.io
-- **Clawdbot**: https://github.com/clawdbot/clawdbot
+- **OpenClaw**: https://github.com/openclaw/openclaw
 
 ## Tags
 
@@ -67,10 +67,10 @@ For detailed setup instructions, deployment guides, and troubleshooting, visit:
 ## Support
 
 For issues related to:
-- **Docker image**: https://github.com/YAlmuzaini/clawdbot.docker/issues
-- **Clawdbot itself**: https://github.com/clawdbot/clawdbot/issues
+- **Docker image**: https://github.com/YAlmuzaini/openclaw.docker/issues
+- **OpenClaw itself**: https://github.com/openclaw/openclaw/issues
 - **Coolify**: https://coolify.io/docs
 
 ## License
 
-See the [Clawdbot repository](https://github.com/clawdbot/clawdbot) for license information.
+See the [OpenClaw repository](https://github.com/openclaw/openclaw) for license information.

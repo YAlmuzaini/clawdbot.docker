@@ -1,9 +1,9 @@
 services:
-  clawdbot-gateway:
+  openclaw-gateway:
     # Use pre-built image from Docker Hub (recommended)
-    # Set CLAWDBOT_IMAGE to your Docker Hub image, e.g., "almuzaini/clawdbot:latest"
-    image: ${CLAWDBOT_IMAGE:-almuzaini/clawdbot:latest}
-    # Uncomment below to build from source instead (requires Clawdbot repository)
+    # Set OPENCLAW_IMAGE to your Docker Hub image, e.g., "almuzaini/openclaw:latest"
+    image: ${OPENCLAW_IMAGE:-almuzaini/openclaw:latest}
+    # Uncomment below to build from source instead (requires OpenClaw repository)
     # build:
     #   context: .
     #   dockerfile: Dockerfile
@@ -16,17 +16,17 @@ services:
       - HOME=/home/node
       - NODE_ENV=production
       - TERM=xterm-256color
-      - CLAWDBOT_GATEWAY_BIND=${CLAWDBOT_GATEWAY_BIND:-lan}
-      - CLAWDBOT_GATEWAY_PORT=${CLAWDBOT_GATEWAY_PORT:-18789}
-      - CLAWDBOT_GATEWAY_TOKEN=${CLAWDBOT_GATEWAY_TOKEN:?}
+      - OPENCLAW_GATEWAY_BIND=${OPENCLAW_GATEWAY_BIND:-lan}
+      - OPENCLAW_GATEWAY_PORT=${OPENCLAW_GATEWAY_PORT:-18789}
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN:?}
       - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD:?}
-      - XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-/home/node/.clawdbot}
+      - XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-/home/node/.openclaw}
       - PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     volumes:
       # Persistent config directory (gateway config, tokens, model auth profiles, skill configs)
       - type: bind
-        source: ./data/.clawdbot
-        target: /home/node/.clawdbot
+        source: ./data/.openclaw
+        target: /home/node/.openclaw
         is_directory: true
       # Persistent workspace directory (agent workspace, code, artifacts)
       - type: bind
@@ -35,23 +35,23 @@ services:
         is_directory: true
     ports:
       # Gateway port - Coolify will proxy this via domain or you can access directly
-      # For Coolify domain routing, use SERVICE_URL_CLAWDBOT_GATEWAY magic variable
-      - "${CLAWDBOT_GATEWAY_PORT:-18789}:18789"
+      # For Coolify domain routing, use SERVICE_URL_OPENCLAW_GATEWAY magic variable
+      - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
       # Optional: Canvas host port (only if running iOS/Android nodes)
       # - "18793:18793"
     command:
       - /bin/sh
       - -c
       - |
-        # Sync CLAWDBOT_GATEWAY_TOKEN from environment to config file if set
-        if [ -n "$$CLAWDBOT_GATEWAY_TOKEN" ] && [ -f "/home/node/.clawdbot/clawdbot.json" ]; then
+        # Sync OPENCLAW_GATEWAY_TOKEN from environment to config file if set
+        if [ -n "$$OPENCLAW_GATEWAY_TOKEN" ] && [ -f "/home/node/.openclaw/openclaw.json" ]; then
           node -e "
             const fs = require('fs');
-            const configPath = '/home/node/.clawdbot/clawdbot.json';
+            const configPath = '/home/node/.openclaw/openclaw.json';
             if (fs.existsSync(configPath)) {
               const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-              if (config.gateway && config.gateway.auth && process.env.CLAWDBOT_GATEWAY_TOKEN) {
-                const envToken = process.env.CLAWDBOT_GATEWAY_TOKEN;
+              if (config.gateway && config.gateway.auth && process.env.OPENCLAW_GATEWAY_TOKEN) {
+                const envToken = process.env.OPENCLAW_GATEWAY_TOKEN;
                 if (config.gateway.auth.token !== envToken) {
                   config.gateway.auth.token = envToken;
                   fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
@@ -62,9 +62,9 @@ services:
           "
         fi
         # Start the gateway
-        exec node dist/index.js gateway --allow-unconfigured --bind $${CLAWDBOT_GATEWAY_BIND:-lan} --port $${CLAWDBOT_GATEWAY_PORT:-18789}
+        exec node dist/index.js gateway --allow-unconfigured --bind $${OPENCLAW_GATEWAY_BIND:-lan} --port $${OPENCLAW_GATEWAY_PORT:-18789}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:18789/__clawdbot__/canvas/ || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:18789/__openclaw__/canvas/ || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -74,10 +74,10 @@ services:
       - coolify.type=application
 
   # Optional: CLI service for running commands (onboarding, channel setup, etc.)
-  clawdbot-cli:
+  openclaw-cli:
     # Use same image as gateway
-    image: ${CLAWDBOT_IMAGE:-almuzaini/clawdbot:latest}
-    # Uncomment below to build from source instead (requires Clawdbot repository)
+    image: ${OPENCLAW_IMAGE:-almuzaini/openclaw:latest}
+    # Uncomment below to build from source instead (requires OpenClaw repository)
     # build:
     #   context: .
     #   dockerfile: Dockerfile
@@ -90,11 +90,11 @@ services:
       - NODE_ENV=production
       - TERM=xterm-256color
       - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD:?}
-      - XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-/home/node/.clawdbot}
+      - XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-/home/node/.openclaw}
     volumes:
       - type: bind
-        source: ./data/.clawdbot
-        target: /home/node/.clawdbot
+        source: ./data/.openclaw
+        target: /home/node/.openclaw
         is_directory: true
       - type: bind
         source: ./data/clawd

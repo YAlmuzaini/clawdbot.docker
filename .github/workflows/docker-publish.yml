@@ -13,7 +13,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME || 'almuzaini' }}/clawdbot
+  IMAGE_NAME: ${{ secrets.DOCKER_HUB_USERNAME || 'almuzaini' }}/openclaw
 
 jobs:
   build-and-push:
@@ -29,16 +29,16 @@ jobs:
           repository: ${{ github.repository }}
           path: docker-config
 
-      - name: Checkout Clawdbot source repository
+      - name: Checkout OpenClaw source repository
         uses: actions/checkout@v4
         with:
-          repository: clawdbot/clawdbot
+          repository: openclaw/openclaw
           fetch-depth: 0
-          path: clawdbot-source
+          path: openclaw-source
 
       - name: Copy Dockerfile to source repository
         run: |
-          cp docker-config/Dockerfile clawdbot-source/Dockerfile
+          cp docker-config/Dockerfile openclaw-source/Dockerfile
           echo "Dockerfile copied successfully"
 
       - name: Set up Docker Buildx
@@ -67,8 +67,8 @@ jobs:
       - name: Build and push
         uses: docker/build-push-action@v5
         with:
-          context: ./clawdbot-source
-          file: ./clawdbot-source/Dockerfile
+          context: ./openclaw-source
+          file: ./openclaw-source/Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

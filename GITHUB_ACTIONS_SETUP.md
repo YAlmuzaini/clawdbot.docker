@@ -2,7 +2,7 @@
 
 ## Yes, this will update your Docker Hub image! ✅
 
-The workflow automatically builds for **both AMD64 and ARM64** and pushes to Docker Hub at `almuzaini/clawdbot:latest` (and version tags).
+The workflow automatically builds for **both AMD64 and ARM64** and pushes to Docker Hub at `almuzaini/openclaw:latest` (and version tags).
 
 ## Required Setup
 
@@ -10,13 +10,13 @@ The workflow automatically builds for **both AMD64 and ARM64** and pushes to Doc
 
 1. Go to https://hub.docker.com/settings/security
 2. Click "New Access Token"
-3. Name it: `github-actions-clawdbot`
+3. Name it: `github-actions-openclaw`
 4. Set permissions: **Read & Write**
 5. Copy the token (you'll only see it once!)
 
 ### 2. Add GitHub Secrets
 
-1. Go to your repository: https://github.com/YAlmuzaini/clawdbot.docker
+1. Go to your repository: https://github.com/YAlmuzaini/openclaw.docker
 2. Click **Settings** → **Secrets and variables** → **Actions**
 3. Click **New repository secret** and add:
 
@@ -28,7 +28,7 @@ The workflow automatically builds for **both AMD64 and ARM64** and pushes to Doc
    - Name: `DOCKER_HUB_TOKEN`
    - Value: `[paste your Docker Hub access token from step 1]`
 
-   **Secret 3 (if clawdbot/clawdbot is private):**
+   **Secret 3 (if openclaw/openclaw is private):**
    - Name: `GH_PAT`
    - Value: `[your GitHub Personal Access Token with repo access]`
    - Note: Only needed if the source repo is private
@@ -38,16 +38,16 @@ The workflow automatically builds for **both AMD64 and ARM64** and pushes to Doc
 ### Option A: Push a Tag (Recommended)
 
 ```bash
-cd /Users/almuzaini/Documents/CodeInfraTech/clawdbot.docker
+cd /Users/almuzaini/Documents/CodeInfraTech/openclaw.docker
 git tag v2026.1.24-3
 git push origin v2026.1.24-3
 ```
 
 This will:
 - Build for AMD64 and ARM64
-- Push to `almuzaini/clawdbot:latest`
-- Push to `almuzaini/clawdbot:2026.1.24-3`
-- Push to `almuzaini/clawdbot:v2026.1.24-3`
+- Push to `almuzaini/openclaw:latest`
+- Push to `almuzaini/openclaw:2026.1.24-3`
+- Push to `almuzaini/openclaw:v2026.1.24-3`
 
 ### Option B: Manual Trigger (GitHub UI)
 
@@ -59,7 +59,7 @@ This will:
 
 ## What Gets Pushed
 
-- **Tag**: `almuzaini/clawdbot:latest` (always updated)
+- **Tag**: `almuzaini/openclaw:latest` (always updated)
 - **Version tags**: Based on your git tag (e.g., `v2026.1.24-3`)
 - **Platforms**: Both `linux/amd64` and `linux/arm64`
 
@@ -69,7 +69,7 @@ After the workflow completes:
 
 ```bash
 # Check the image supports AMD64
-docker manifest inspect almuzaini/clawdbot:latest
+docker manifest inspect almuzaini/openclaw:latest
 ```
 
 You should see both `amd64` and `arm64` in the output.
@@ -81,7 +81,7 @@ You should see both `amd64` and `arm64` in the output.
 - Make sure the token has **Read & Write** permissions
 
 ### "Repository not found" or "Permission denied"
-- If `clawdbot/clawdbot` is private, you need `GH_PAT` secret
+- If `openclaw/openclaw` is private, you need `GH_PAT` secret
 - Create a GitHub Personal Access Token with `repo` scope
 
 ### Build fails

@@ -1,31 +1,31 @@
 # Published Docker Images
 
-Your Clawdbot Docker image is published to Docker Hub:
+Your OpenClaw Docker image is published to Docker Hub:
 
-**Repository:** https://hub.docker.com/r/almuzaini/clawdbot
+**Repository:** https://hub.docker.com/r/almuzaini/openclaw
 
 ## Available Tags
 
-- `almuzaini/clawdbot:latest` - Latest version
-- `almuzaini/clawdbot:2026.1.24-3` - Specific version
+- `almuzaini/openclaw:latest` - Latest version
+- `almuzaini/openclaw:2026.1.24-3` - Specific version
 
 ## Quick Usage
 
 ```bash
-docker pull almuzaini/clawdbot:latest
+docker pull almuzaini/openclaw:latest
 docker run -d -p 18789:18789 \
-  -e CLAWDBOT_GATEWAY_TOKEN=your-token \
+  -e OPENCLAW_GATEWAY_TOKEN=your-token \
   -e GOG_KEYRING_PASSWORD=your-password \
-  -v $(pwd)/.clawdbot:/home/node/.clawdbot \
+  -v $(pwd)/.openclaw:/home/node/.openclaw \
   -v $(pwd)/clawd:/home/node/clawd \
-  almuzaini/clawdbot:latest
+  almuzaini/openclaw:latest
 ```
 
-Or use the `docker-compose.yml` file with `CLAWDBOT_IMAGE=almuzaini/clawdbot:latest`.
+Or use the `docker-compose.yml` file with `OPENCLAW_IMAGE=almuzaini/openclaw:latest`.
 
 ## Updating
 
 ```bash
-docker tag clawdbot:local almuzaini/clawdbot:latest
-docker push almuzaini/clawdbot:latest
+docker tag openclaw:local almuzaini/openclaw:latest
+docker push almuzaini/openclaw:latest
 ```

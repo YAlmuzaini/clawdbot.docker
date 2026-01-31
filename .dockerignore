@@ -35,7 +35,7 @@ Thumbs.db
 
 # Data directories (should be mounted, not copied)
 data/
-.clawdbot/
+.openclaw/
 clawd/
 
 # Test files

@@ -4,7 +4,7 @@
 
 ```bash
 # Get container name
-docker ps -a | grep clawdbot
+docker ps -a | grep openclaw
 
 # Check exit code and reason
 docker inspect <container-name> | grep -A 5 "State"
@@ -33,7 +33,7 @@ docker inspect <container-name> | grep -i memory
 
 ```bash
 # Get container name
-CONTAINER=$(docker ps | grep clawdbot-gateway | awk '{print $1}' | head -1)
+CONTAINER=$(docker ps | grep openclaw-gateway | awk '{print $1}' | head -1)
 
 # Run onboard in background (detached)
 docker exec -d $CONTAINER sh -c "node --max-old-space-size=1536 dist/index.js onboard > /tmp/onboard.log 2>&1"
@@ -73,7 +73,7 @@ docker exec -it $CONTAINER node dist/index.js onboard --verbose 2>&1 | tee onboa
 
 ```bash
 # This will run even if terminal closes
-CONTAINER=$(docker ps | grep clawdbot-gateway | awk '{print $1}' | head -1)
+CONTAINER=$(docker ps | grep openclaw-gateway | awk '{print $1}' | head -1)
 docker exec -d $CONTAINER sh -c "nohup node --max-old-space-size=1536 dist/index.js onboard > /tmp/onboard.log 2>&1 &"
 ```
 

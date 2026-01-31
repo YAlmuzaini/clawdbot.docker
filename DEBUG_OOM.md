@@ -10,7 +10,7 @@
 ### 1. Check Container Logs
 ```bash
 # Get the container name
-docker ps -a | grep clawdbot
+docker ps -a | grep openclaw
 
 # Check logs for OOM or errors
 docker logs <container-name> --tail 100

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script to build and publish Clawdbot Docker image to Docker Hub
+# Script to build and publish OpenClaw Docker image to Docker Hub
 # Usage: ./publish.sh [tag] [dockerhub-username]
 # Example: ./publish.sh v1.0.0 myusername
 
@@ -25,28 +25,28 @@ if [ "$DOCKERHUB_USER" == "yourusername" ]; then
     exit 1
 fi
 
-IMAGE_NAME="${DOCKERHUB_USER}/clawdbot"
+IMAGE_NAME="${DOCKERHUB_USER}/openclaw"
 
-echo -e "${GREEN}Building and publishing Clawdbot Docker image${NC}"
+echo -e "${GREEN}Building and publishing OpenClaw Docker image${NC}"
 echo -e "Image: ${YELLOW}${IMAGE_NAME}:${TAG}${NC}"
 echo ""
 
-# Check if we're in the Clawdbot repository
+# Check if we're in the OpenClaw repository
 if [ ! -f "package.json" ] || [ ! -f "pnpm-lock.yaml" ]; then
-    echo -e "${RED}Error: This script must be run from the Clawdbot repository root${NC}"
-    echo "Please clone the Clawdbot repository first:"
-    echo "  git clone https://github.com/clawdbot/clawdbot.git"
-    echo "  cd clawdbot"
+    echo -e "${RED}Error: This script must be run from the OpenClaw repository root${NC}"
+    echo "Please clone the OpenClaw repository first:"
+    echo "  git clone https://github.com/openclaw/openclaw.git"
+    echo "  cd openclaw"
     echo ""
     echo "Then copy the Dockerfile from this repository:"
-    echo "  cp /path/to/clawdbot.docker/Dockerfile ."
+    echo "  cp /path/to/openclaw.docker/Dockerfile ."
     exit 1
 fi
 
 # Check if Dockerfile exists
 if [ ! -f "Dockerfile" ]; then
     echo -e "${YELLOW}Warning: Dockerfile not found in current directory${NC}"
-    echo "Please copy the Dockerfile from the clawdbot.docker repository"
+    echo "Please copy the Dockerfile from the openclaw.docker repository"
     exit 1
 fi
 
@@ -88,7 +88,7 @@ echo ""
 echo -e "${GREEN}✓ Successfully published ${IMAGE_NAME}:${TAG}${NC}"
 echo ""
 echo "Users can now use your image by setting:"
-echo "  CLAWDBOT_IMAGE=${IMAGE_NAME}:${TAG}"
+echo "  OPENCLAW_IMAGE=${IMAGE_NAME}:${TAG}"
 echo ""
 echo "Or in docker-compose.yml:"
 echo "  image: ${IMAGE_NAME}:${TAG}"

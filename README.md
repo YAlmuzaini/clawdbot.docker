@@ -1,16 +1,16 @@
-# Clawdbot Docker Deployment for Coolify
+# OpenClaw Docker Deployment for Coolify
 
 > ⚠️ **EXPERIMENTAL - NOT READY FOR PRODUCTION USE** ⚠️
 > 
 > This Docker image is experimental and was initially created to work with [Coolify](https://coolify.io). It may contain bugs, incomplete features, or other issues. Use at your own risk.
 
-This project contains the Docker configuration for deploying Clawdbot Gateway on [Coolify](https://coolify.io).
+This project contains the Docker configuration for deploying OpenClaw Gateway on [Coolify](https://coolify.io).
 
 ## Overview
 
-Clawdbot is a gateway service that can be deployed as a containerized application. This setup includes:
+OpenClaw is a gateway service that can be deployed as a containerized application. This setup includes:
 
-- **Dockerfile**: Builds the Clawdbot image with baked-in binaries
+- **Dockerfile**: Builds the OpenClaw image with baked-in binaries
 - **docker-compose.yml**: Multi-service configuration for Coolify deployment
 - **Persistent storage**: Config and workspace directories survive restarts
 - **Health checks**: Automatic health monitoring
@@ -29,19 +29,19 @@ No source code needed! Just use the published Docker image.
    ```
 
    **Required variables:**
-   - `CLAWDBOT_GATEWAY_TOKEN`: Generate with `openssl rand -hex 32`
+   - `OPENCLAW_GATEWAY_TOKEN`: Generate with `openssl rand -hex 32`
    - `GOG_KEYRING_PASSWORD`: Generate with `openssl rand -hex 32` (if using Gmail)
-   - `CLAWDBOT_IMAGE`: Set to your Docker Hub image (e.g., `almuzaini/clawdbot:latest`)
+   - `OPENCLAW_IMAGE`: Set to your Docker Hub image (e.g., `almuzaini/openclaw:latest`)
 
    Edit `.env` and set all required values.
 
    - **Create a new Docker Compose resource** in [Coolify](https://coolify.io)
    - **Point to this repository** or upload the `docker-compose.yml` file
    - **Set environment variables** in Coolify's UI (they'll be auto-detected from the compose file)
-     - Make sure `CLAWDBOT_IMAGE` points to your Docker Hub image
+     - Make sure `OPENCLAW_IMAGE` points to your Docker Hub image
    - **Configure domain** (optional):
-     - Assign a domain to the `clawdbot-gateway` service
-     - Or use `SERVICE_URL_CLAWDBOT_GATEWAY` magic variable in your compose file
+     - Assign a domain to the `openclaw-gateway` service
+     - Or use `SERVICE_URL_OPENCLAW_GATEWAY` magic variable in your compose file
    - **Deploy**
 
    The compose file is configured to pull from Docker Hub by default. No source code needed!
@@ -50,11 +50,11 @@ No source code needed! Just use the published Docker image.
 
 If you want to build the image yourself or customize it:
 
-1. **Clone the Clawdbot Repository**
+1. **Clone the OpenClaw Repository**
 
    ```bash
-   git clone https://github.com/clawdbot/clawdbot.git
-   cd clawdbot
+   git clone https://github.com/openclaw/openclaw.git
+   cd openclaw
    ```
 
 2. **Copy Docker Files**
@@ -62,13 +62,13 @@ If you want to build the image yourself or customize it:
    Copy the Dockerfile from this repository:
 
    ```bash
-   cp /path/to/clawdbot.docker/Dockerfile .
+   cp /path/to/openclaw.docker/Dockerfile .
    ```
 
 3. **Build the Image**
 
    ```bash
-   docker build -t yourusername/clawdbot:latest .
+   docker build -t yourusername/openclaw:latest .
    ```
 
 4. **Update docker-compose.yml**
@@ -77,8 +77,8 @@ If you want to build the image yourself or customize it:
 
    ```yaml
    services:
-     clawdbot-gateway:
-       # image: ${CLAWDBOT_IMAGE:-yourusername/clawdbot:latest}
+     openclaw-gateway:
+       # image: ${OPENCLAW_IMAGE:-yourusername/openclaw:latest}
        build:
          context: .
          dockerfile: Dockerfile
@@ -94,7 +94,7 @@ For detailed build instructions, see [BUILD.md](./BUILD.md).
 
 The compose file defines two persistent volumes:
 
-- **Config directory** (`./data/.clawdbot`): Gateway config, tokens, model auth profiles, skill configs
+- **Config directory** (`./data/.openclaw`): Gateway config, tokens, model auth profiles, skill configs
 - **Workspace directory** (`./data/clawd`): Agent workspace, code, and artifacts
 
 These directories are created automatically by [Coolify](https://coolify.io) using `is_directory: true`.
@@ -109,20 +109,20 @@ These directories are created automatically by [Coolify](https://coolify.io) usi
 All environment variables are automatically detected by Coolify from the compose file. Required variables (marked with `:?`) will be highlighted in the UI.
 
 **Magic Environment Variables** (Coolify-specific):
-- `SERVICE_URL_CLAWDBOT_GATEWAY`: Auto-generated URL for the gateway
-- `SERVICE_FQDN_CLAWDBOT_GATEWAY`: Auto-generated FQDN
-- `SERVICE_PASSWORD_CLAWDBOT_GATEWAY`: Auto-generated password
+- `SERVICE_URL_OPENCLAW_GATEWAY`: Auto-generated URL for the gateway
+- `SERVICE_FQDN_OPENCLAW_GATEWAY`: Auto-generated FQDN
+- `SERVICE_PASSWORD_OPENCLAW_GATEWAY`: Auto-generated password
 
 ### Health Checks
 
 The gateway service includes a health check that runs:
 ```bash
-curl -f http://localhost:18789/__clawdbot__/canvas/
+curl -f http://localhost:18789/__openclaw__/canvas/
 ```
 
 ## Using the CLI Service
 
-The `clawdbot-cli` service is available for running commands. It uses the `cli` profile, so it won't start automatically.
+The `openclaw-cli` service is available for running commands. It uses the `cli` profile, so it won't start automatically.
 
 To use it in Coolify, you can:
 1. Run commands via Coolify's terminal/exec feature
@@ -132,16 +132,16 @@ Example commands:
 
 ```bash
 # Onboarding
-docker compose run --rm clawdbot-cli onboard
+docker compose run --rm openclaw-cli onboard
 
 # Channel setup (WhatsApp)
-docker compose run --rm clawdbot-cli channels login
+docker compose run --rm openclaw-cli channels login
 
 # Channel setup (Telegram)
-docker compose run --rm clawdbot-cli channels add --channel telegram --token "<token>"
+docker compose run --rm openclaw-cli channels add --channel telegram --token "<token>"
 
 # Channel setup (Discord)
-docker compose run --rm clawdbot-cli channels add --channel discord --token "<token>"
+docker compose run --rm openclaw-cli channels add --channel discord --token "<token>"
 ```
 
 ## Baked-in Binaries
@@ -158,7 +158,7 @@ To add more binaries, edit the `Dockerfile` and add installation commands follow
 
 ### Via Domain (Recommended)
 
-1. Assign a domain to the `clawdbot-gateway` service in [Coolify](https://coolify.io)
+1. Assign a domain to the `openclaw-gateway` service in [Coolify](https://coolify.io)
 2. Access via `http://your-domain.com` or `https://your-domain.com`
 3. Paste your gateway token in the Control UI (Settings → token)
 
@@ -175,15 +175,15 @@ If you expose the port directly (not recommended for production):
 Check that binaries are installed correctly:
 
 ```bash
-docker compose exec clawdbot-gateway which gog
-docker compose exec clawdbot-gateway which goplaces
-docker compose exec clawdbot-gateway which wacli
+docker compose exec openclaw-gateway which gog
+docker compose exec openclaw-gateway which goplaces
+docker compose exec openclaw-gateway which wacli
 ```
 
 ### Check Logs
 
 ```bash
-docker compose logs -f clawdbot-gateway
+docker compose logs -f openclaw-gateway
 ```
 
 Look for:
@@ -196,14 +196,14 @@ Look for:
 After restarting, verify that your config and workspace persist:
 
 ```bash
-docker compose exec clawdbot-gateway ls -la /home/node/.clawdbot
-docker compose exec clawdbot-gateway ls -la /home/node/clawd
+docker compose exec openclaw-gateway ls -la /home/node/.openclaw
+docker compose exec openclaw-gateway ls -la /home/node/clawd
 ```
 
 ### Health Check Issues
 
 If health checks are failing:
-1. Verify `CLAWDBOT_GATEWAY_TOKEN` is set correctly
+1. Verify `OPENCLAW_GATEWAY_TOKEN` is set correctly
 2. Check that the gateway is actually running
 3. Review logs for errors
 
@@ -219,7 +219,7 @@ If health checks are failing:
    - Monitor resource usage
 
 3. **Backups**:
-   - Regularly backup the `./data/.clawdbot` directory
+   - Regularly backup the `./data/.openclaw` directory
    - Backup the `./data/clawd` workspace directory
 
 4. **Updates**:
@@ -236,7 +236,7 @@ If health checks are failing:
 
 ## Links
 
-- **Repository**: https://github.com/YAlmuzaini/clawdbot.docker
+- **Repository**: https://github.com/YAlmuzaini/openclaw.docker
 - **Coolify**: https://coolify.io
-- **Clawdbot**: https://github.com/clawdbot/clawdbot
-- **Docker Hub**: https://hub.docker.com/r/almuzaini/clawdbot
+- **OpenClaw**: https://github.com/openclaw/openclaw
+- **Docker Hub**: https://hub.docker.com/r/almuzaini/openclaw

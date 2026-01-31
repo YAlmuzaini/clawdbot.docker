@@ -5,7 +5,7 @@
 
 # Data directories (persistent storage)
 data/
-.clawdbot/
+.openclaw/
 clawd/
 
 # Node modules

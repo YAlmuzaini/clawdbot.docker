@@ -1,32 +1,32 @@
-# Building and Publishing Clawdbot Docker Image
+# Building and Publishing OpenClaw Docker Image
 
-This guide explains how to build the Clawdbot Docker image and publish it to Docker Hub for others to use.
+This guide explains how to build the OpenClaw Docker image and publish it to Docker Hub for others to use.
 
 ## Prerequisites
 
 1. **Docker** installed and running
 2. **Docker Hub account** (create one at https://hub.docker.com)
-3. **Clawdbot source code** (clone from https://github.com/clawdbot/clawdbot)
+3. **OpenClaw source code** (clone from https://github.com/openclaw/openclaw)
 
 ## Building the Image
 
-### Step 1: Clone the Clawdbot Repository
+### Step 1: Clone the OpenClaw Repository
 
 ```bash
-git clone https://github.com/clawdbot/clawdbot.git
-cd clawdbot
+git clone https://github.com/openclaw/openclaw.git
+cd openclaw
 ```
 
 ### Step 2: Copy Docker Files
 
-Copy the Dockerfile and related files from this repository into the Clawdbot root:
+Copy the Dockerfile and related files from this repository into the OpenClaw root:
 
 ```bash
 # Copy Dockerfile
-cp /path/to/clawdbot.docker/Dockerfile .
+cp /path/to/openclaw.docker/Dockerfile .
 
 # Copy .dockerignore (optional but recommended)
-cp /path/to/clawdbot.docker/.dockerignore .
+cp /path/to/openclaw.docker/.dockerignore .
 ```
 
 ### Step 3: Build the Image
@@ -34,14 +34,14 @@ cp /path/to/clawdbot.docker/.dockerignore .
 Build the image with your Docker Hub username:
 
 ```bash
-docker build -t yourusername/clawdbot:latest .
+docker build -t yourusername/openclaw:latest .
 ```
 
 Or build with a specific tag:
 
 ```bash
-docker build -t yourusername/clawdbot:v1.0.0 .
-docker build -t yourusername/clawdbot:latest .
+docker build -t yourusername/openclaw:v1.0.0 .
+docker build -t yourusername/openclaw:latest .
 ```
 
 ### Step 4: Test the Image Locally
@@ -50,12 +50,12 @@ Before publishing, test that the image works:
 
 ```bash
 # Test that the image runs
-docker run --rm yourusername/clawdbot:latest node dist/index.js --help
+docker run --rm yourusername/openclaw:latest node dist/index.js --help
 
 # Verify binaries are installed
-docker run --rm yourusername/clawdbot:latest which gog
-docker run --rm yourusername/clawdbot:latest which goplaces
-docker run --rm yourusername/clawdbot:latest which wacli
+docker run --rm yourusername/openclaw:latest which gog
+docker run --rm yourusername/openclaw:latest which goplaces
+docker run --rm yourusername/openclaw:latest which wacli
 ```
 
 ## Publishing to Docker Hub
@@ -74,16 +74,16 @@ Push your image to Docker Hub:
 
 ```bash
 # Push latest tag
-docker push yourusername/clawdbot:latest
+docker push yourusername/openclaw:latest
 
 # Push version tag
-docker push yourusername/clawdbot:v1.0.0
+docker push yourusername/openclaw:v1.0.0
 ```
 
 ### Step 3: Verify on Docker Hub
 
 1. Go to https://hub.docker.com
-2. Navigate to your repository: `https://hub.docker.com/r/yourusername/clawdbot`
+2. Navigate to your repository: `https://hub.docker.com/r/yourusername/openclaw`
 3. Verify the image is listed with the correct tags
 
 ## Automated Publishing with GitHub Actions
@@ -101,7 +101,7 @@ on:
 
 env:
   REGISTRY: docker.io
-  IMAGE_NAME: yourusername/clawdbot
+  IMAGE_NAME: yourusername/openclaw
 
 jobs:
   build-and-push:
@@ -111,10 +111,10 @@ jobs:
       packages: write
 
     steps:
-      - name: Checkout Clawdbot repository
+      - name: Checkout OpenClaw repository
         uses: actions/checkout@v4
         with:
-          repository: clawdbot/clawdbot
+          repository: openclaw/openclaw
           fetch-depth: 0
 
       - name: Set up Docker Buildx
@@ -167,31 +167,31 @@ docker buildx create --name multiarch --use
 # Build for multiple platforms
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
-  -t yourusername/clawdbot:latest \
+  -t yourusername/openclaw:latest \
   --push \
   .
 ```
 
 ## Updating the Image
 
-When Clawdbot releases a new version:
+When OpenClaw releases a new version:
 
 1. **Update the source:**
    ```bash
-   cd clawdbot
+   cd openclaw
    git pull origin main
    ```
 
 2. **Rebuild the image:**
    ```bash
-   docker build -t yourusername/clawdbot:latest .
-   docker build -t yourusername/clawdbot:v1.1.0 .
+   docker build -t yourusername/openclaw:latest .
+   docker build -t yourusername/openclaw:v1.1.0 .
    ```
 
 3. **Push both tags:**
    ```bash
-   docker push yourusername/clawdbot:latest
-   docker push yourusername/clawdbot:v1.1.0
+   docker push yourusername/openclaw:latest
+   docker push yourusername/openclaw:v1.1.0
    ```
 
 ## Docker Hub Repository Settings
@@ -199,45 +199,45 @@ When Clawdbot releases a new version:
 For better discoverability on Docker Hub:
 
 1. **Add a description** in the repository settings
-2. **Add tags** like: `clawdbot`, `gateway`, `automation`, `docker`
-3. **Link to documentation** (this README or the main Clawdbot docs)
+2. **Add tags** like: `openclaw`, `gateway`, `automation`, `docker`
+3. **Link to documentation** (this README or the main OpenClaw docs)
 4. **Add a README** on Docker Hub with quick start instructions
 
 ## Example Docker Hub README
 
 ```markdown
-# Clawdbot Docker Image
+# OpenClaw Docker Image
 
-Pre-built Docker image for Clawdbot Gateway.
+Pre-built Docker image for OpenClaw Gateway.
 
 ## Quick Start
 
 ```bash
 docker run -d \
   -p 18789:18789 \
-  -v $(pwd)/.clawdbot:/home/node/.clawdbot \
+  -v $(pwd)/.openclaw:/home/node/.openclaw \
   -v $(pwd)/clawd:/home/node/clawd \
-  -e CLAWDBOT_GATEWAY_TOKEN=your-token \
-  yourusername/clawdbot:latest
+  -e OPENCLAW_GATEWAY_TOKEN=your-token \
+  yourusername/openclaw:latest
 ```
 
 ## Documentation
 
-See the [full documentation](https://github.com/yourusername/clawdbot.docker) for deployment instructions.
+See the [full documentation](https://github.com/yourusername/openclaw.docker) for deployment instructions.
 ```
 
 ## Troubleshooting
 
 ### Build fails with "package.json not found"
 
-Make sure you're building from the Clawdbot repository root, not from this directory.
+Make sure you're building from the OpenClaw repository root, not from this directory.
 
 ### Build is slow
 
 The first build will be slow. Subsequent builds will be faster due to Docker layer caching. Consider using BuildKit:
 
 ```bash
-DOCKER_BUILDKIT=1 docker build -t yourusername/clawdbot:latest .
+DOCKER_BUILDKIT=1 docker build -t yourusername/openclaw:latest .
 ```
 
 ### Push fails with "unauthorized"
@@ -256,4 +256,4 @@ The image includes build tools and source code. Consider using multi-stage build
 - Never commit Docker Hub credentials to version control
 - Use Docker Hub access tokens instead of passwords
 - Regularly update the base image (`node:22-bookworm`) for security patches
-- Scan images for vulnerabilities: `docker scan yourusername/clawdbot:latest`
+- Scan images for vulnerabilities: `docker scan yourusername/openclaw:latest`
