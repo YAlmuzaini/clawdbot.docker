@@ -77,7 +77,12 @@ docker compose up -d openclaw
 http://localhost:18789
 ```
 
-7. Paste your gateway token from `.env`
+7. Paste your gateway token from `.env` (the `SERVICE_PASSWORD_OPENCLAW` value)
+
+**Note**: The gateway starts with `--allow-unconfigured` for easy deployment. You can optionally run the full onboarding setup later:
+```bash
+docker compose run --rm openclaw-cli onboard
+```
 
 ### Using the CLI
 
@@ -223,7 +228,7 @@ These automatically map to `/home/node/.openclaw` inside the container. No actio
 
 ### OpenClaw Issues
 
-**Q: Gateway won't start**
+**Q: Gateway won't start or shows "Missing config" error**
 
 Check the logs:
 ```bash
@@ -231,6 +236,11 @@ Check the logs:
 # Or if using local Docker:
 docker compose logs -f openclaw
 ```
+
+**Solution**: The templates include `--allow-unconfigured` flag to allow the gateway to start without initial onboarding. If you see "Missing config" errors, verify:
+1. The `--allow-unconfigured` flag is in the command
+2. Your token is set in `SERVICE_PASSWORD_OPENCLAW`
+3. Config directory exists and is mounted properly
 
 Common issues:
 - Missing or invalid gateway token

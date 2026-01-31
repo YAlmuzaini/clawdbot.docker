@@ -28,6 +28,7 @@ services:
         "${OPENCLAW_GATEWAY_BIND:-lan}",
         "--port",
         "${OPENCLAW_GATEWAY_PORT:-18789}",
+        "--allow-unconfigured",
       ]
     healthcheck:
       test: ["CMD", "node", "dist/index.js", "health", "--token", "$$OPENCLAW_GATEWAY_TOKEN"]
