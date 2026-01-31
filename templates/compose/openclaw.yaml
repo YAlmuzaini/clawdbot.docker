@@ -27,17 +27,7 @@ services:
         source: ./openclaw-workspace
         target: /home/node/.openclaw/workspace
         is_directory: true
-    command:
-      [
-        "node",
-        "dist/index.mjs",
-        "gateway",
-        "--bind",
-        "lan",
-        "--port",
-        "18789",
-        "--allow-unconfigured",
-      ]
+    command: ["sh", "-c", "exec node dist/index.mjs gateway --bind lan --port 18789 --allow-unconfigured"]
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://$(hostname -i):18789/ || exit 1"]
       interval: 30s
