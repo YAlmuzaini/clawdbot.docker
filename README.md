@@ -1,242 +1,198 @@
-# OpenClaw Docker Deployment for Coolify
+# OpenClaw Coolify Service Template
 
-> ⚠️ **EXPERIMENTAL - NOT READY FOR PRODUCTION USE** ⚠️
-> 
-> This Docker image is experimental and was initially created to work with [Coolify](https://coolify.io). It may contain bugs, incomplete features, or other issues. Use at your own risk.
+This repository contains the Coolify one-click service template for [OpenClaw](https://github.com/openclaw/openclaw), an AI-powered multi-channel messaging gateway with agent sandboxing capabilities.
 
-This project contains the Docker configuration for deploying OpenClaw Gateway on [Coolify](https://coolify.io).
+## What is OpenClaw?
 
-## Overview
+OpenClaw is a production-grade AI messaging gateway that connects multiple channels (WhatsApp, Telegram, Discord) to LLM providers with advanced features like:
 
-OpenClaw is a gateway service that can be deployed as a containerized application. This setup includes:
+- 🤖 Multi-channel messaging (WhatsApp, Telegram, Discord)
+- 🔒 Agent sandboxing with Docker isolation
+- 🎯 Multi-agent routing
+- 🛠️ Extensible tool system
+- 📦 Self-hosted with full data control
 
-- **Dockerfile**: Builds the OpenClaw image with baked-in binaries
-- **docker-compose.yml**: Multi-service configuration for Coolify deployment
-- **Persistent storage**: Config and workspace directories survive restarts
-- **Health checks**: Automatic health monitoring
-- **Optional binaries**: Pre-installed tools (gog, goplaces, wacli)
+## Quick Start with Coolify
 
-## Quick Start
+### Deploy OpenClaw in Coolify
 
-### Option A: Using Pre-built Image from Docker Hub (Recommended)
+1. Log into your Coolify instance
+2. Navigate to **Services** → **One-Click Services**
+3. Search for **OpenClaw**
+4. Click **Deploy**
+5. Coolify will automatically:
+   - Generate a secure gateway token
+   - Create persistent storage volumes
+   - Deploy the OpenClaw gateway
+   - Set up proxy routing
 
-No source code needed! Just use the published Docker image.
+6. Once deployed, access the Control UI at your assigned domain
+7. Paste the gateway token from Coolify's environment variables
 
-   Copy the example environment file and fill in your values:
+That's it! OpenClaw is now running and ready to use.
 
-   ```bash
-   cp .env.example .env
-   ```
+## Local Development/Testing
 
-   **Required variables:**
-   - `OPENCLAW_GATEWAY_TOKEN`: Generate with `openssl rand -hex 32`
-   - `GOG_KEYRING_PASSWORD`: Generate with `openssl rand -hex 32` (if using Gmail)
-   - `OPENCLAW_IMAGE`: Set to your Docker Hub image (e.g., `almuzaini/openclaw:latest`)
+### Prerequisites
 
-   Edit `.env` and set all required values.
+- Docker & Docker Compose v2
+- Git
 
-   - **Create a new Docker Compose resource** in [Coolify](https://coolify.io)
-   - **Point to this repository** or upload the `docker-compose.yml` file
-   - **Set environment variables** in Coolify's UI (they'll be auto-detected from the compose file)
-     - Make sure `OPENCLAW_IMAGE` points to your Docker Hub image
-   - **Configure domain** (optional):
-     - Assign a domain to the `openclaw-gateway` service
-     - Or use `SERVICE_URL_OPENCLAW_GATEWAY` magic variable in your compose file
-   - **Deploy**
+### Setup
 
-   The compose file is configured to pull from Docker Hub by default. No source code needed!
-
-### Option B: Building from Source
-
-If you want to build the image yourself or customize it:
-
-1. **Clone the OpenClaw Repository**
-
-   ```bash
-   git clone https://github.com/openclaw/openclaw.git
-   cd openclaw
-   ```
-
-2. **Copy Docker Files**
-
-   Copy the Dockerfile from this repository:
-
-   ```bash
-   cp /path/to/openclaw.docker/Dockerfile .
-   ```
-
-3. **Build the Image**
-
-   ```bash
-   docker build -t yourusername/openclaw:latest .
-   ```
-
-4. **Update docker-compose.yml**
-
-   Uncomment the `build:` section and comment out or remove the `image:` line:
-
-   ```yaml
-   services:
-     openclaw-gateway:
-       # image: ${OPENCLAW_IMAGE:-yourusername/openclaw:latest}
-       build:
-         context: .
-         dockerfile: Dockerfile
-   ```
-
-5. **Follow steps from Option A** to configure and deploy
-
-For detailed build instructions, see [BUILD.md](./BUILD.md).
-
-## Configuration
-
-### Persistent Storage
-
-The compose file defines two persistent volumes:
-
-- **Config directory** (`./data/.openclaw`): Gateway config, tokens, model auth profiles, skill configs
-- **Workspace directory** (`./data/clawd`): Agent workspace, code, and artifacts
-
-These directories are created automatically by [Coolify](https://coolify.io) using `is_directory: true`.
-
-### Service Ports
-
-- **Gateway**: Port `18789` (default)
-- **Canvas** (optional): Port `18793` (only if running iOS/Android nodes)
-
-### Environment Variables
-
-All environment variables are automatically detected by Coolify from the compose file. Required variables (marked with `:?`) will be highlighted in the UI.
-
-**Magic Environment Variables** (Coolify-specific):
-- `SERVICE_URL_OPENCLAW_GATEWAY`: Auto-generated URL for the gateway
-- `SERVICE_FQDN_OPENCLAW_GATEWAY`: Auto-generated FQDN
-- `SERVICE_PASSWORD_OPENCLAW_GATEWAY`: Auto-generated password
-
-### Health Checks
-
-The gateway service includes a health check that runs:
+1. Clone this repository:
 ```bash
-curl -f http://localhost:18789/__openclaw__/canvas/
+git clone https://github.com/yourusername/openclaw.docker.git
+cd openclaw.docker
 ```
 
-## Using the CLI Service
+2. Copy the environment file:
+```bash
+cp .env.example .env
+```
 
-The `openclaw-cli` service is available for running commands. It uses the `cli` profile, so it won't start automatically.
+3. Generate a secure token:
+```bash
+openssl rand -hex 32
+```
 
-To use it in Coolify, you can:
-1. Run commands via Coolify's terminal/exec feature
-2. Or temporarily enable the service
+4. Edit `.env` and set your `OPENCLAW_GATEWAY_TOKEN`
 
-Example commands:
+5. Start the gateway:
+```bash
+docker compose up -d openclaw-gateway
+```
+
+6. Access the Control UI:
+```
+http://localhost:18789
+```
+
+7. Paste your gateway token from `.env`
+
+### Using the CLI
+
+The CLI is useful for configuration tasks like setting up channels:
 
 ```bash
-# Onboarding
-docker compose run --rm openclaw-cli onboard
-
-# Channel setup (WhatsApp)
+# WhatsApp (QR code login)
 docker compose run --rm openclaw-cli channels login
 
-# Channel setup (Telegram)
-docker compose run --rm openclaw-cli channels add --channel telegram --token "<token>"
+# Telegram (bot token)
+docker compose run --rm openclaw-cli channels add --channel telegram --token <your_bot_token>
 
-# Channel setup (Discord)
-docker compose run --rm openclaw-cli channels add --channel discord --token "<token>"
+# Discord (bot token)
+docker compose run --rm openclaw-cli channels add --channel discord --token <your_bot_token>
 ```
 
-## Baked-in Binaries
+### Health Check
 
-The Dockerfile includes several pre-installed binaries:
-
-- **gog**: Gmail CLI
-- **goplaces**: Google Places CLI
-- **wacli**: WhatsApp CLI
-
-To add more binaries, edit the `Dockerfile` and add installation commands following the same pattern.
-
-## Accessing the Gateway
-
-### Via Domain (Recommended)
-
-1. Assign a domain to the `openclaw-gateway` service in [Coolify](https://coolify.io)
-2. Access via `http://your-domain.com` or `https://your-domain.com`
-3. Paste your gateway token in the Control UI (Settings → token)
-
-### Via Direct Port
-
-If you expose the port directly (not recommended for production):
-- Access via `http://your-server-ip:18789`
-- Ensure proper firewall configuration
-
-## Troubleshooting
-
-### Verify Binaries
-
-Check that binaries are installed correctly:
+Verify the gateway is running:
 
 ```bash
-docker compose exec openclaw-gateway which gog
-docker compose exec openclaw-gateway which goplaces
-docker compose exec openclaw-gateway which wacli
+docker compose exec openclaw-gateway node dist/index.js health --token "$OPENCLAW_GATEWAY_TOKEN"
 ```
 
-### Check Logs
+### View Logs
 
 ```bash
 docker compose logs -f openclaw-gateway
 ```
 
-Look for:
-```
-[gateway] listening on ws://0.0.0.0:18789
-```
+## Architecture
 
-### Verify Persistence
+### Components
 
-After restarting, verify that your config and workspace persist:
+- **Gateway Service**: Main OpenClaw WebSocket/HTTP server
+- **CLI Service**: Configuration and management tool
+- **Persistent Storage**:
+  - `./openclaw-config`: Gateway configuration, tokens, sessions
+  - `./openclaw-workspace`: Agent workspace and artifacts
 
+### Ports
+
+| Port | Service | Description |
+|------|---------|-------------|
+| 18789 | Gateway | Main HTTP/WebSocket interface |
+
+### Environment Variables
+
+| Variable | Required | Default | Description |
+|----------|----------|---------|-------------|
+| `OPENCLAW_GATEWAY_TOKEN` | Yes | - | Authentication token for gateway |
+| `OPENCLAW_GATEWAY_BIND` | No | `lan` | Network bind address |
+| `OPENCLAW_GATEWAY_PORT` | No | `18789` | Gateway port |
+| `OPENCLAW_CONFIG_DIR` | No | `./openclaw-config` | Config storage path |
+| `OPENCLAW_WORKSPACE_DIR` | No | `./openclaw-workspace` | Workspace storage path |
+
+## Contributing the Template to Coolify
+
+This repository is structured to contribute the OpenClaw service template to the official Coolify repository.
+
+### Files for Coolify Contribution
+
+1. **`templates/compose/openclaw.yaml`** - The main service template
+2. **`svgs/openclaw.svg`** - Service logo
+
+### How to Contribute
+
+1. Fork the [Coolify repository](https://github.com/coollabsio/coolify)
+
+2. Copy the template files:
 ```bash
-docker compose exec openclaw-gateway ls -la /home/node/.openclaw
-docker compose exec openclaw-gateway ls -la /home/node/clawd
+# Copy template
+cp templates/compose/openclaw.yaml <coolify-repo>/templates/compose/
+
+# Copy logo
+cp svgs/openclaw.svg <coolify-repo>/svgs/
 ```
 
-### Health Check Issues
+3. Test the template:
+   - Use "Docker Compose Empty" in your Coolify instance
+   - Paste the template content
+   - Deploy and verify all functionality
 
-If health checks are failing:
-1. Verify `OPENCLAW_GATEWAY_TOKEN` is set correctly
-2. Check that the gateway is actually running
-3. Review logs for errors
+4. Submit a Pull Request to Coolify:
+   - Include both files in your PR
+   - Reference this repository in the PR description
+   - Add any special configuration notes
 
-## Production Considerations
+### Testing Checklist
 
-1. **Security**:
-   - Use strong, randomly generated tokens
-   - Keep `.env` file secure (never commit it)
-   - Consider using secrets management in [Coolify](https://coolify.io)
+Before submitting your PR, verify:
 
-2. **Resource Limits**:
-   - Set appropriate memory limits in Coolify (recommend at least 2GB)
-   - Monitor resource usage
+- ✅ Container starts successfully
+- ✅ Port 18789 is accessible via Coolify proxy
+- ✅ Config directory is created and persists
+- ✅ Workspace directory is created and persists
+- ✅ Health check passes
+- ✅ Gateway token from Coolify magic variable works
+- ✅ Control UI loads and accepts token
+- ✅ Container restarts retain data
 
-3. **Backups**:
-   - Regularly backup the `./data/.openclaw` directory
-   - Backup the `./data/clawd` workspace directory
+## Documentation
 
-4. **Updates**:
-   - Regularly update the Docker image
-   - Test updates in a staging environment first
+### OpenClaw Documentation
+- [Official Docs](https://docs.openclaw.ai/)
+- [Docker Setup Guide](./docs/intsall/docker.md)
+- [Hetzner VPS Guide](./docs/platforms/hetzner.md)
 
-## Important Notes
+### Coolify Documentation
+- [Docker Compose in Coolify](./docs/coolify-docs/docker/compose.md)
+- [Contributing a Service](./docs/coolify-docs/docker/contribute/service.md)
+- [Custom Docker Options](./docs/coolify-docs/docker/custom-commands.md)
 
-⚠️ **This is an experimental Docker image.**
-- Not tested for production use
-- May have bugs or incomplete features
-- Created primarily for [Coolify](https://coolify.io) deployment
-- Use at your own risk
+## Support
 
-## Links
+- **OpenClaw Issues**: [GitHub Issues](https://github.com/openclaw/openclaw/issues)
+- **Coolify Issues**: [GitHub Issues](https://github.com/coollabsio/coolify/issues)
+- **OpenClaw Discord**: [Join Community](https://discord.gg/openclaw)
 
-- **Repository**: https://github.com/YAlmuzaini/openclaw.docker
-- **Coolify**: https://coolify.io
-- **OpenClaw**: https://github.com/openclaw/openclaw
-- **Docker Hub**: https://hub.docker.com/r/almuzaini/openclaw
+## License
+
+This repository follows the same license as OpenClaw. The Coolify service template is provided as-is for community contribution.
+
+## Credits
+
+- **OpenClaw**: [openclaw/openclaw](https://github.com/openclaw/openclaw)
+- **Coolify**: [coollabsio/coolify](https://github.com/coollabsio/coolify)

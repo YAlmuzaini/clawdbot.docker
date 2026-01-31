@@ -1,106 +1,48 @@
 services:
   openclaw-gateway:
-    # Use pre-built image from Docker Hub (recommended)
-    # Set OPENCLAW_IMAGE to your Docker Hub image, e.g., "almuzaini/openclaw:latest"
-    image: ${OPENCLAW_IMAGE:-almuzaini/openclaw:latest}
-    # Uncomment below to build from source instead (requires OpenClaw repository)
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
+    image: ghcr.io/openclaw/openclaw:main
+    container_name: openclaw-gateway
     restart: unless-stopped
-    # Note: Resource limits should be set in Coolify UI (Application Settings → Resources)
-    # Recommended: At least 2GB memory limit for onboard command
-    env_file:
-      - .env
     environment:
       - HOME=/home/node
       - NODE_ENV=production
       - TERM=xterm-256color
       - OPENCLAW_GATEWAY_BIND=${OPENCLAW_GATEWAY_BIND:-lan}
       - OPENCLAW_GATEWAY_PORT=${OPENCLAW_GATEWAY_PORT:-18789}
-      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN:?}
-      - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD:?}
-      - XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-/home/node/.openclaw}
-      - PATH=/home/linuxbrew/.linuxbrew/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN}
+      - XDG_CONFIG_HOME=/home/node/.openclaw
     volumes:
-      # Persistent config directory (gateway config, tokens, model auth profiles, skill configs)
-      - type: bind
-        source: ./data/.openclaw
-        target: /home/node/.openclaw
-        is_directory: true
-      # Persistent workspace directory (agent workspace, code, artifacts)
-      - type: bind
-        source: ./data/clawd
-        target: /home/node/clawd
-        is_directory: true
+      - ${OPENCLAW_CONFIG_DIR:-./openclaw-config}:/home/node/.openclaw
+      - ${OPENCLAW_WORKSPACE_DIR:-./openclaw-workspace}:/home/node/.openclaw/workspace
     ports:
-      # Gateway port - Coolify will proxy this via domain or you can access directly
-      # For Coolify domain routing, use SERVICE_URL_OPENCLAW_GATEWAY magic variable
       - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
-      # Optional: Canvas host port (only if running iOS/Android nodes)
-      # - "18793:18793"
     command:
-      - /bin/sh
-      - -c
-      - |
-        # Sync OPENCLAW_GATEWAY_TOKEN from environment to config file if set
-        if [ -n "$$OPENCLAW_GATEWAY_TOKEN" ] && [ -f "/home/node/.openclaw/openclaw.json" ]; then
-          node -e "
-            const fs = require('fs');
-            const configPath = '/home/node/.openclaw/openclaw.json';
-            if (fs.existsSync(configPath)) {
-              const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-              if (config.gateway && config.gateway.auth && process.env.OPENCLAW_GATEWAY_TOKEN) {
-                const envToken = process.env.OPENCLAW_GATEWAY_TOKEN;
-                if (config.gateway.auth.token !== envToken) {
-                  config.gateway.auth.token = envToken;
-                  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-                  console.log('[startup] Synced config token to match environment variable');
-                }
-              }
-            }
-          "
-        fi
-        # Start the gateway
-        exec node dist/index.js gateway --allow-unconfigured --bind $${OPENCLAW_GATEWAY_BIND:-lan} --port $${OPENCLAW_GATEWAY_PORT:-18789}
+      [
+        "node",
+        "dist/index.js",
+        "gateway",
+        "--bind",
+        "${OPENCLAW_GATEWAY_BIND:-lan}",
+        "--port",
+        "${OPENCLAW_GATEWAY_PORT:-18789}",
+      ]
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:18789/__openclaw__/canvas/ || exit 1"]
+      test: ["CMD", "node", "dist/index.js", "health", "--token", "$$OPENCLAW_GATEWAY_TOKEN"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
-    labels:
-      - coolify.managed=true
-      - coolify.type=application
 
-  # Optional: CLI service for running commands (onboarding, channel setup, etc.)
   openclaw-cli:
-    # Use same image as gateway
-    image: ${OPENCLAW_IMAGE:-almuzaini/openclaw:latest}
-    # Uncomment below to build from source instead (requires OpenClaw repository)
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
+    image: ghcr.io/openclaw/openclaw:main
+    container_name: openclaw-cli
     profiles:
       - cli
-    env_file:
-      - .env
     environment:
       - HOME=/home/node
-      - NODE_ENV=production
-      - TERM=xterm-256color
-      - GOG_KEYRING_PASSWORD=${GOG_KEYRING_PASSWORD:?}
-      - XDG_CONFIG_HOME=${XDG_CONFIG_HOME:-/home/node/.openclaw}
+      - XDG_CONFIG_HOME=/home/node/.openclaw
     volumes:
-      - type: bind
-        source: ./data/.openclaw
-        target: /home/node/.openclaw
-        is_directory: true
-      - type: bind
-        source: ./data/clawd
-        target: /home/node/clawd
-        is_directory: true
-    exclude_from_hc: true
-    labels:
-      - coolify.managed=true
-      - coolify.type=application
+      - ${OPENCLAW_CONFIG_DIR:-./openclaw-config}:/home/node/.openclaw
+      - ${OPENCLAW_WORKSPACE_DIR:-./openclaw-workspace}:/home/node/.openclaw/workspace
+    entrypoint: ["/bin/sh"]
+    command: ["-c", "echo 'Use: docker compose run --rm openclaw-cli <command>'"]
