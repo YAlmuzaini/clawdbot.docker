@@ -4,13 +4,15 @@ services:
     container_name: openclaw-gateway
     restart: unless-stopped
     environment:
+      - SERVICE_FQDN_OPENCLAW
+      - SERVICE_URL_OPENCLAW_18789
       - HOME=/home/node
       - NODE_ENV=production
       - TERM=xterm-256color
       - OPENCLAW_GATEWAY_BIND=${OPENCLAW_GATEWAY_BIND:-lan}
       - OPENCLAW_GATEWAY_PORT=${OPENCLAW_GATEWAY_PORT:-18789}
       - SERVICE_PASSWORD_OPENCLAW=${SERVICE_PASSWORD_OPENCLAW}
-      - OPENCLAW_GATEWAY_TOKEN=${SERVICE_PASSWORD_OPENCLAW}
+      - OPENCLAW_GATEWAY_TOKEN=${OPENCLAW_GATEWAY_TOKEN:-${SERVICE_PASSWORD_OPENCLAW}}
       - XDG_CONFIG_HOME=/home/node/.openclaw
     volumes:
       - ${OPENCLAW_CONFIG_DIR:-./openclaw-config}:/home/node/.openclaw

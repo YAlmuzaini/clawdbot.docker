@@ -21,21 +21,25 @@ OpenClaw is a production-grade AI messaging gateway that connects multiple chann
 3. Search for **OpenClaw**
 4. Click **Deploy**
 5. Coolify will automatically:
+   - Generate a domain via `SERVICE_URL_OPENCLAW_18789` (e.g., `https://openclaw-xxxxx.yourdomain.com`)
    - Generate a secure gateway token via `SERVICE_PASSWORD_OPENCLAW`
    - Create persistent storage volumes
    - Deploy the OpenClaw gateway
-   - Set up proxy routing
+   - Set up proxy routing to port 18789
 
-6. Once deployed, go to your service's **Environment Variables** section
-7. Find `SERVICE_PASSWORD_OPENCLAW` - this is your gateway token (auto-generated)
-8. Access the Control UI at your assigned domain
-9. Paste the `SERVICE_PASSWORD_OPENCLAW` value into the Control UI
+6. Once deployed, check the **Domains** section for your assigned URL
+7. Go to **Environment Variables** section:
+   - `SERVICE_PASSWORD_OPENCLAW` - auto-generated secure token
+   - `OPENCLAW_GATEWAY_TOKEN` - defaults to the above value (visible in UI, can be customized)
+8. Copy the token value (either one, they're the same by default)
+9. Open your assigned domain in a browser
+10. Paste the token into the Control UI
 
-**Note**: Both `SERVICE_PASSWORD_OPENCLAW` and `OPENCLAW_GATEWAY_TOKEN` will have the same value. Use either one.
+**Generated Variables**: Coolify creates `SERVICE_FQDN_OPENCLAW`, `SERVICE_URL_OPENCLAW_18789`, `SERVICE_PASSWORD_OPENCLAW`, and makes `OPENCLAW_GATEWAY_TOKEN` visible (defaulting to the password). All are visible in the Environment Variables section.
 
 That's it! OpenClaw is now running and ready to use.
 
-## Local Development/Testing
+## Docker Compose Deployment
 
 ### Prerequisites
 
@@ -107,11 +111,11 @@ docker compose logs -f openclaw-gateway
 
 ### Components
 
-- **Gateway Service**: Main OpenClaw WebSocket/HTTP server
+- **Gateway Service**: Main OpenClaw WebSocket/HTTP server (production-ready)
 - **CLI Service**: Configuration and management tool
 - **Persistent Storage**:
-  - `./openclaw-config`: Gateway configuration, tokens, sessions
-  - `./openclaw-workspace`: Agent workspace and artifacts
+  - `./openclaw-config` (or custom path): Gateway configuration, tokens, sessions
+  - `./openclaw-workspace` (or custom path): Agent workspace and artifacts
 
 ### Ports
 
@@ -121,13 +125,26 @@ docker compose logs -f openclaw-gateway
 
 ### Environment Variables
 
+### Coolify Magic Variables (Auto-generated)
+
+When deployed via Coolify, these are automatically generated:
+
+| Variable | Type | Description |
+|----------|------|-------------|
+| `SERVICE_FQDN_OPENCLAW` | Coolify Magic | Auto-generated domain (e.g., `openclaw-xxxxx.example.com`) |
+| `SERVICE_URL_OPENCLAW_18789` | Coolify Magic | Auto-generated URL with proxy to port 18789 |
+| `SERVICE_PASSWORD_OPENCLAW` | Coolify Magic | Auto-generated secure gateway token |
+| `OPENCLAW_GATEWAY_TOKEN` | Coolify Variable | Defaults to `SERVICE_PASSWORD_OPENCLAW`, visible in UI, can be customized |
+
+### Standard Variables
+
 | Variable | Required | Default | Description |
 |----------|----------|---------|-------------|
-| `OPENCLAW_GATEWAY_TOKEN` | Yes | - | Authentication token for gateway |
+| `OPENCLAW_GATEWAY_TOKEN` | Yes (local) | Auto (Coolify) | Authentication token for gateway |
 | `OPENCLAW_GATEWAY_BIND` | No | `lan` | Network bind address |
 | `OPENCLAW_GATEWAY_PORT` | No | `18789` | Gateway port |
-| `OPENCLAW_CONFIG_DIR` | No | `./openclaw-config` | Config storage path |
-| `OPENCLAW_WORKSPACE_DIR` | No | `./openclaw-workspace` | Workspace storage path |
+| `OPENCLAW_CONFIG_DIR` | No | `./openclaw-config` | Config storage path (local only) |
+| `OPENCLAW_WORKSPACE_DIR` | No | `./openclaw-workspace` | Workspace storage path (local only) |
 
 ## Contributing the Template to Coolify
 
