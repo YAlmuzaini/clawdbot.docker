@@ -19,7 +19,7 @@ services:
       - ${OPENCLAW_WORKSPACE_DIR:-./openclaw-workspace}:/home/node/.openclaw/workspace
     ports:
       - "${OPENCLAW_GATEWAY_PORT:-18789}:18789"
-    command: ["sh", "-c", "exec node dist/index.mjs gateway --bind ${OPENCLAW_GATEWAY_BIND:-lan} --port ${OPENCLAW_GATEWAY_PORT:-18789} --allow-unconfigured"]
+    entrypoint: ["sh", "-c", "exec node dist/index.mjs gateway --bind ${OPENCLAW_GATEWAY_BIND:-lan} --port ${OPENCLAW_GATEWAY_PORT:-18789} --allow-unconfigured"]
     healthcheck:
       test: ["CMD-SHELL", "curl -sf http://$(hostname -i):18789/ || exit 1"]
       interval: 30s
