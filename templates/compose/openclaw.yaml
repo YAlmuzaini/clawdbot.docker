@@ -30,7 +30,7 @@ services:
     command:
       [
         "node",
-        "dist/index.js",
+        "dist/index.mjs",
         "gateway",
         "--bind",
         "lan",
@@ -39,7 +39,7 @@ services:
         "--allow-unconfigured",
       ]
     healthcheck:
-      test: ["CMD", "node", "dist/index.js", "health", "--token", "$$OPENCLAW_GATEWAY_TOKEN"]
+      test: ["CMD", "node", "dist/index.mjs", "health", "--token", "$$OPENCLAW_GATEWAY_TOKEN"]
       interval: 30s
       timeout: 10s
       retries: 3
