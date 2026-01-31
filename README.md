@@ -28,14 +28,15 @@ OpenClaw is a production-grade AI messaging gateway that connects multiple chann
    - Set up proxy routing to port 18789
 
 6. Once deployed, check the **Domains** section for your assigned URL
-7. Go to **Environment Variables** section:
-   - `SERVICE_PASSWORD_OPENCLAW` - auto-generated secure token
-   - `OPENCLAW_GATEWAY_TOKEN` - defaults to the above value (visible in UI, can be customized)
-8. Copy the token value (either one, they're the same by default)
-9. Open your assigned domain in a browser
-10. Paste the token into the Control UI
+7. Go to **Environment Variables** section and copy the `SERVICE_PASSWORD_OPENCLAW` token
+8. Open your assigned domain in a browser  
+9. Paste the token into the Control UI
 
-**Generated Variables**: Coolify creates `SERVICE_FQDN_OPENCLAW`, `SERVICE_URL_OPENCLAW_18789`, `SERVICE_PASSWORD_OPENCLAW`, and makes `OPENCLAW_GATEWAY_TOKEN` visible (defaulting to the password). All are visible in the Environment Variables section.
+**Generated Variables**: 
+- `SERVICE_FQDN_OPENCLAW` - Your domain FQDN
+- `SERVICE_URL_OPENCLAW_18789` - Your proxied URL
+- `SERVICE_PASSWORD_OPENCLAW` - Your gateway token (use this to login)
+- `OPENCLAW_GATEWAY_TOKEN` - Automatically set to the password value
 
 That's it! OpenClaw is now running and ready to use.
 
@@ -68,7 +69,7 @@ openssl rand -hex 32
 
 5. Start the gateway:
 ```bash
-docker compose up -d openclaw-gateway
+docker compose up -d openclaw
 ```
 
 6. Access the Control UI:
@@ -98,13 +99,13 @@ docker compose run --rm openclaw-cli channels add --channel discord --token <you
 Verify the gateway is running:
 
 ```bash
-docker compose exec openclaw-gateway node dist/index.js health --token "$OPENCLAW_GATEWAY_TOKEN"
+docker compose exec openclaw node dist/index.js health --token "$OPENCLAW_GATEWAY_TOKEN"
 ```
 
 ### View Logs
 
 ```bash
-docker compose logs -f openclaw-gateway
+docker compose logs -f openclaw
 ```
 
 ## Architecture
@@ -134,7 +135,7 @@ When deployed via Coolify, these are automatically generated:
 | `SERVICE_FQDN_OPENCLAW` | Coolify Magic | Auto-generated domain (e.g., `openclaw-xxxxx.example.com`) |
 | `SERVICE_URL_OPENCLAW_18789` | Coolify Magic | Auto-generated URL with proxy to port 18789 |
 | `SERVICE_PASSWORD_OPENCLAW` | Coolify Magic | Auto-generated secure gateway token |
-| `OPENCLAW_GATEWAY_TOKEN` | Coolify Variable | Defaults to `SERVICE_PASSWORD_OPENCLAW`, visible in UI, can be customized |
+| `OPENCLAW_GATEWAY_TOKEN` | Auto-set | Automatically uses `SERVICE_PASSWORD_OPENCLAW` value |
 
 ### Standard Variables
 
@@ -228,7 +229,7 @@ Check the logs:
 ```bash
 # In Coolify, go to Logs section
 # Or if using local Docker:
-docker compose logs -f openclaw-gateway
+docker compose logs -f openclaw
 ```
 
 Common issues:

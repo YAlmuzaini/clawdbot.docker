@@ -72,7 +72,7 @@ nano .env  # or your favorite editor
 # Set: OPENCLAW_GATEWAY_TOKEN=<your_generated_token>
 
 # 5. Start gateway
-docker compose up -d openclaw-gateway
+docker compose up -d openclaw
 
 # 6. Access Control UI
 open http://localhost:18789
@@ -113,17 +113,17 @@ Services → Your OpenClaw → Environment Variables
 ### Local
 ```bash
 # View logs
-docker compose logs -f openclaw-gateway
+docker compose logs -f openclaw
 
 # Restart gateway
-docker compose restart openclaw-gateway
+docker compose restart openclaw
 
 # Stop gateway
 docker compose down
 
 # Update to latest image
 docker compose pull
-docker compose up -d openclaw-gateway
+docker compose up -d openclaw
 
 # Run CLI commands
 docker compose run --rm openclaw-cli channels login
@@ -182,8 +182,8 @@ docker compose run --rm openclaw-cli channels add --channel telegram --token <TO
 
 ### Local: Gateway Won't Start
 1. Check `.env` file exists: `ls -la .env`
-2. Verify token is set: `grep OPENCLAW_GATEWAY_TOKEN .env`
-3. Check logs: `docker compose logs openclaw-gateway`
+2. Verify token is set: `grep SERVICE_PASSWORD_OPENCLAW .env`
+3. Check logs: `docker compose logs openclaw`
 4. Verify port not in use: `lsof -i :18789` (macOS/Linux)
 
 ### Both: Can't Access Control UI
